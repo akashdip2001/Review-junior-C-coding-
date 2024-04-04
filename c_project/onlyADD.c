@@ -1,46 +1,59 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-struct record{
+#define MAX_NAME_LENGTH 10 // Maximum length of the name field
+
+struct record {
     char date[12];
     int id; 
-    char name[10];
+    char name[MAX_NAME_LENGTH + 1]; // +1 for null terminator
     unsigned int total;
     int percentage;
 };
 
-void add(){
+void add() {
     FILE *fp;
+    struct record st;
+    char date[12];
+    time_t current_time = time(NULL); // Get current time
+    struct tm *time_info = localtime(&current_time); // Convert to local time
+
+    // Open file for appending in binary mode
     fp = fopen("Fileprac.txt", "ab");
     if (fp == NULL) {
         printf("Error opening file.\n");
         return;
     }
 
-    struct record st;
-    char date[12];
-    time_t s = time(NULL);
-    struct tm dd = *localtime(&s);
-    sprintf(date, "%02d/%02d/%02d", dd.tm_mday, dd.tm_mon + 1, dd.tm_year + 1900);
+    // Format current date
+    sprintf(date, "%02d/%02d/%d", time_info->tm_mday, time_info->tm_mon + 1, time_info->tm_year + 1900);
     strcpy(st.date, date);
 
+    // Input id
     printf("Enter the id: ");
     scanf("%d", &st.id);
 
-    printf("Enter the name: ");
-    scanf("%9s", st.name);
+    // Input name
+    printf("Enter the name (max %d characters): ", MAX_NAME_LENGTH);
+    scanf("%s", st.name); // No need for & for strings
 
+    // Input total
     printf("Enter the total: ");
     scanf("%u", &st.total);
-    
+
+    // Added successfully
     printf("Added successfully\n");
+
+    // Write record to file
     fwrite(&st, sizeof(st), 1, fp);
+
+    // Close file
     fclose(fp);
 }
 
-int main(){
-    add();
+int main() {
+    add(); // Call add function
     return 0;
 }
